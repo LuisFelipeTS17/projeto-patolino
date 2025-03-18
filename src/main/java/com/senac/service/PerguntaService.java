@@ -11,7 +11,7 @@ public class PerguntaService {
     private List<Pergunta> perguntas = new ArrayList<>();
     private int faseAtual = 1;
     private static final String ARQUIVO = "src/main/resources/perguntas.dat";
-    private static final List<String> FASES = List.of("Estrutura de Dados", "Algoritmos", "Banco de Dados", "Redes");
+    private static final List<String> FASES = List.of("Estrutura de Dados", "Algoritmos");
 
     public PerguntaService() {
         carregarDados();
