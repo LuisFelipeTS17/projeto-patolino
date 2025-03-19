@@ -23,7 +23,9 @@ public class Main {
                     String pergunta = scanner.nextLine();
                     System.out.print("Digite a resposta: ");
                     String resposta = scanner.nextLine();
-                    jogo.adicionarPergunta(pergunta, resposta);
+                    System.out.print("Digite a fase (Estrutura de Dados, Algoritmos, Banco de Dados, Redes): ");
+                    String fase = scanner.nextLine();
+                    jogo.adicionarPergunta(pergunta, resposta, fase);
                     break;
                 case 2:
                     jogo.jogar();
