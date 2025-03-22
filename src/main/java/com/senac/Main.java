@@ -1,8 +1,8 @@
 package com.senac;
 
-import com.senac.service.PerguntaService;
-
 import java.util.Scanner;
+
+import com.senac.service.PerguntaService;
 
 public class Main {
     public static void main(String[] args) {
@@ -27,6 +27,7 @@ public class Main {
                     String fase = scanner.nextLine();
                     jogo.adicionarPergunta(pergunta, resposta, fase);
                     break;
+                // ..
                 case 2:
                     jogo.jogar();
                     break;
