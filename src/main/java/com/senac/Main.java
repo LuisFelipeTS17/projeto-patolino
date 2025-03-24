@@ -1,13 +1,15 @@
 package com.senac;
 
-import com.senac.service.PerguntaService;
-
 import java.util.Scanner;
+
+import com.senac.service.PerguntaService;
 
 public class Main {
     public static void main(String[] args) {
         PerguntaService jogo = new PerguntaService();
         Scanner scanner = new Scanner(System.in);
+
+        System.out.println("mensagem de alteração");
 
         while (true) {
             System.out.println("1 - Adicionar Pergunta");
@@ -40,6 +42,7 @@ public class Main {
 //
 //                    jogo.adicionarPergunta(pergunta, resposta, fase);
                     break;
+                // ..
                 case 2:
                     jogo.jogar();
                     break;
