@@ -2,40 +2,42 @@ package com.senac.service;
 
 import com.senac.model.Pergunta;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class PerguntaService {
     private List<Pergunta> perguntas = new ArrayList<>();
     private int faseAtual = 1;
-    private static final String ARQUIVO = "src/main/resources/perguntas.dat";
-    private static final List<String> FASES = List.of("Estrutura de Dados", "Algoritmos");
+    String[] alternativas = {"a", "b", "c", "d"};
+    private static final String ARQUIVO = "src/main/resources/perguntas.txt";
+    private static List<String> fases = new ArrayList<>();
 
     public PerguntaService() {
         carregarDados();
+        Set<String> fasesSet = new HashSet<>();
+        for (Pergunta p : perguntas) {
+            fasesSet.add(p.getFase());
+        }
+        fases.addAll(fasesSet);
     }
 
-    public void adicionarPergunta(String pergunta, String resposta, String fase) {
-        perguntas.add(new Pergunta(pergunta, resposta, fase));
-        salvarDados();
-    }
+//    public void adicionarPergunta(String pergunta, String[] alternativas, String resposta, String fase) {
+//        perguntas.add(new Pergunta(pergunta, alternativas, resposta, fase));
+//        salvarDados();
+//    }
 
     public void jogar() {
-        if (faseAtual > FASES.size()) {
+        if (faseAtual > fases.size()) {
             System.out.println("Parabéns! Você concluiu todas as fases!");
-            return;
         }
 
-        String faseNome = FASES.get(faseAtual - 1);
-        List<Pergunta> perguntasFase = perguntas.stream()
+        String faseNome = fases.get(faseAtual - 1);
+
+        List<Pergunta> perguntasFase = new ArrayList<>(perguntas.stream()
                 .filter(p -> p.getFase().equalsIgnoreCase(faseNome))
-                .toList();
+                .toList());
 
         if (perguntasFase.isEmpty()) {
             System.out.println("Nenhuma pergunta encontrada para esta fase.");
-            return;
         }
 
         Collections.shuffle(perguntasFase);
@@ -44,10 +46,15 @@ public class PerguntaService {
 
         for (Pergunta p : perguntasFase) {
             System.out.println("Pergunta: " + p.getPergunta());
+            Map<String, String> alternativasMap = new HashMap<>();
+            for (int i = 0; i < p.getAlternativas().length; i++) {
+                alternativasMap.put(alternativas[i], p.getAlternativas()[i]);
+                System.out.println(alternativas[i] + ") " + p.getAlternativas()[i]);
+            }
             System.out.print("Resposta: ");
             String respostaUsuario = scanner.nextLine();
 
-            if (p.verificarResposta(respostaUsuario)) {
+            if (alternativasMap.get(respostaUsuario).equalsIgnoreCase(p.getResposta())) {
                 System.out.println("Resposta correta!");
                 acertos++;
             } else {
@@ -55,7 +62,7 @@ public class PerguntaService {
             }
         }
 
-        if (acertos >= (perguntasFase.size() / 2)) {
+        if (acertos == perguntasFase.size()) {
             System.out.println("Você avançou para a próxima fase!");
             faseAtual++;
         } else {
@@ -66,7 +73,7 @@ public class PerguntaService {
     private void salvarDados() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO))) {
             for (Pergunta p : perguntas) {
-                writer.write(p.getPergunta() + " | " + p.getResposta() + " | " + p.getFase() + "\n");
+                writer.write(p.getPergunta() + " | " + Arrays.stream(p.getAlternativas()).toList() + p.getResposta() + " | " + p.getFase() + "\n");
             }
         } catch (IOException e) {
             System.out.println("Erro ao salvar dados.");
@@ -79,8 +86,9 @@ public class PerguntaService {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] partes = linha.split("\\|");
-                if (partes.length == 3) {
-                    perguntas.add(new Pergunta(partes[0].trim(), partes[1].trim(), partes[2].trim()));
+                if (partes.length == 7) {
+                    String[] alternativas = {partes[1].trim(), partes[2].trim(), partes[3].trim(), partes[4].trim()};
+                    perguntas.add(new Pergunta(partes[0].trim(),  alternativas, partes[5].trim(), partes[6].trim()));
                 }
             }
         } catch (IOException e) {
