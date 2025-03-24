@@ -1,0 +1,18 @@
+Qual comando é usado para exibir algo no console em Java? | echo | System.out.println() | printf() | print() | System.out.println() | Java Básico
+Qual das opções abaixo representa um comentário de uma linha em Java? | // comentário | <!-- comentário --> | \* comentário *\ | # comentário | // comentário | Java Básico
+Como declaramos uma variável inteira em Java? | int numero = 10; | integer numero = 10; | num numero = 10; | integer numero; | int numero = 10; | Variáveis
+Qual dos seguintes tipos primitivos armazena números decimais? | int | float | char | boolean | float | Variáveis
+Qual palavra-chave usamos para definir que uma variável não pode mudar seu valor? | static | final | const | let | final | Variáveis
+O que representa o tipo char em Java? | Uma palavra | Um número | Um caracterer | Um texto | Um caracterer | Variáveis
+Qual o operador lógico "||" representa em Java? | E | OU | NOT | Negação | OU | Operadores
+O que o operador == faz em Java com objetos? | Compara valores | Atribui valor | Compara endereços de memória | Nenhuma das anteriores | Compara endereços de memória | Operadores
+Qual operador usamos para adicionar dois valores numéricos? | + | & | % | * | + | Operadores
+Qual estrutura de repetição é usada para executar um bloco enquanto uma condição for verdadeira e você não souber a quantidade de repetições? | for | while | do-while | switch | while | Estruturas de controle
+O que faz a instrução break dentro de um loop? | Continua a próxima repetição | Finaliza o loop imediatamente | Reinicia o loop | Nenhuma das anteriores | Finaliza o loop imediatamente | Estruturas de controle
+Qual dessas palavras-chave é usada para herança em Java? | implement | super | extends | this | extends | POO
+Qual método é o ponto de entrada de um programa Java? | init() | start() | main() | run() | main() | POO
+Qual palavra-chave define um método que pertence à classe e não a uma instância? | public | static | final | void | static | POO
+Qual palavra-chave é usada para criar uma classe em Java? | create | define | class | new | class | POO
+Qual é o tipo de retorno de um método que não retorna nada? | null | empty | void | 0 | void | POO
+Qual palavra-chave usamos para criar um objeto de uma classe? | build | new | object | create | new | POO
+Qual é a função do bloco try-catch? | Criar variáveis | Repetir código | Tratar exceções | Executar um bloco de código | Tratar exceções | POO
