@@ -19,13 +19,26 @@ public class Main {
 
             switch (escolha) {
                 case 1:
-                    System.out.print("Digite a pergunta: ");
-                    String pergunta = scanner.nextLine();
-                    System.out.print("Digite a resposta: ");
-                    String resposta = scanner.nextLine();
-                    System.out.print("Digite a fase (Estrutura de Dados, Algoritmos, Banco de Dados, Redes): ");
-                    String fase = scanner.nextLine();
-                    jogo.adicionarPergunta(pergunta, resposta, fase);
+//                    String[] opcoes = {"a", "b", "c", "d"};
+//                    String[] alternativas = new String[4];
+//                    System.out.print("Digite a pergunta: ");
+//                    String pergunta = scanner.nextLine();
+//                    System.out.println("Digite as alternativas: ");
+//                    for (int i = 0; i < alternativas.length; i++) {
+//                        System.out.println("Digite a alternativa " + opcoes[i] + ": ");
+//                        alternativas[i] = scanner.nextLine();
+//                    }
+//                    System.out.print("Digite a alternativa correta: ");
+//                    for (int i = 0; i < alternativas.length; i++) {
+//                        System.out.println(opcoes[i] + " - " + alternativas[i]);
+//                    }
+//
+//                    String resposta = scanner.nextLine();
+//                    System.out.print("Digite a fase (Estrutura de Dados, Algoritmos, Banco de Dados, Redes): ");
+//                    String fase = scanner.nextLine();
+//
+//
+//                    jogo.adicionarPergunta(pergunta, resposta, fase);
                     break;
                 case 2:
                     jogo.jogar();
