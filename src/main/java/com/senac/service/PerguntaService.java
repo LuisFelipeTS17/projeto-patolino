@@ -7,17 +7,33 @@ import java.util.*;
 public class PerguntaService {
     private List<Pergunta> perguntas = new ArrayList<>();
     private int faseAtual = 1;
-    String[] alternativas = {"a", "b", "c", "d"};
     private static final String ARQUIVO = "src/main/resources/perguntas.txt";
     private static List<String> fases = new ArrayList<>();
+    private static Map<String, Integer> prioridadeFases = new HashMap<>();
 
     public PerguntaService() {
+        carregarPrioridades();
         carregarDados();
+        organizarFases();
+    }
+
+    private void carregarPrioridades() {
+        prioridadeFases.put("Java Básico", 1);
+        prioridadeFases.put("Variáveis", 2);
+        prioridadeFases.put("Operadores", 3);
+        prioridadeFases.put("Estruturas de controle", 4);
+        prioridadeFases.put("POO", 5);
+    }
+
+    private void organizarFases() {
         Set<String> fasesSet = new HashSet<>();
         for (Pergunta p : perguntas) {
             fasesSet.add(p.getFase());
         }
+        fases.clear();
         fases.addAll(fasesSet);
+
+        fases.sort(Comparator.comparingInt(f -> prioridadeFases.getOrDefault(f, Integer.MAX_VALUE)));
     }
 
 //    public void adicionarPergunta(String pergunta, String[] alternativas, String resposta, String fase) {
@@ -46,7 +62,9 @@ public class PerguntaService {
 
         for (Pergunta p : perguntasFase) {
             System.out.println("Pergunta: " + p.getPergunta());
-            Map<String, String> alternativasMap = new HashMap<>();
+            Map<String, String> alternativasMap = new LinkedHashMap<>();
+            String[] alternativas = {"a", "b", "c", "d"};
+
             for (int i = 0; i < p.getAlternativas().length; i++) {
                 alternativasMap.put(alternativas[i], p.getAlternativas()[i]);
                 System.out.println(alternativas[i] + ") " + p.getAlternativas()[i]);
