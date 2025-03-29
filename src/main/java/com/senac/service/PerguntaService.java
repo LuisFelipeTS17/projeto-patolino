@@ -62,7 +62,7 @@ public class PerguntaService {
 
         for (Pergunta p : perguntasFase) {
             System.out.println("Pergunta: " + p.getPergunta());
-            Map<String, String> alternativasMap = new LinkedHashMap<>();
+            Map<String, String> alternativasMap = new HashMap<>();
             String[] alternativas = {"a", "b", "c", "d"};
 
             for (int i = 0; i < p.getAlternativas().length; i++) {
