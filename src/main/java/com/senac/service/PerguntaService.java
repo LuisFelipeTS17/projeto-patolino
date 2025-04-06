@@ -26,6 +26,7 @@ public class PerguntaService {
 //    }
 
     public void jogar() {
+        int vidas = 3;
         if (faseAtual > fases.size()) {
             System.out.println("Parabéns! Você concluiu todas as fases!");
         }
@@ -58,7 +59,14 @@ public class PerguntaService {
                 System.out.println("Resposta correta!");
                 acertos++;
             } else {
+                vidas--;
                 System.out.println("Resposta errada! A resposta correta era: " + p.getResposta());
+                if ( vidas == 0 ) {
+                    System.out.println("Você perdeu todas as vidas! O jogo recomeçara!");
+                    vidas = 3;
+                    faseAtual--;
+                    break;
+                }
             }
         }
 
