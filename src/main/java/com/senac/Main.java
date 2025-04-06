@@ -9,6 +9,8 @@ public class Main {
         PerguntaService jogo = new PerguntaService();
         Scanner scanner = new Scanner(System.in);
 
+        System.out.println("mensagem de alteração");
+
         while (true) {
             System.out.println("1 - Adicionar Pergunta");
             System.out.println("2 - Jogar");
