@@ -1,3 +1,5 @@
+package com.senac.service;
+
 public class PatolinoGm {
 
     public static void main(String[] args) {
