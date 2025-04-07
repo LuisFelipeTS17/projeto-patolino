@@ -1,15 +1,18 @@
 package com.senac;
 
+import java.io.IOException;
 import java.util.Scanner;
 
+import com.senac.model.GerenciadorDeArquivos;
+import com.senac.service.JogoService;
 import com.senac.service.PerguntaService;
 
 public class Main {
     public static void main(String[] args) {
-        PerguntaService jogo = new PerguntaService();
+        GerenciadorDeArquivos arquivos = new GerenciadorDeArquivos();
+        PerguntaService perguntaService = new PerguntaService(arquivos);
+        JogoService jogoService = new JogoService(perguntaService);
         Scanner scanner = new Scanner(System.in);
-
-        System.out.println("mensagem de alteração");
 
         while (true) {
             System.out.println("1 - Adicionar Pergunta");
@@ -21,30 +24,11 @@ public class Main {
 
             switch (escolha) {
                 case 1:
-//                    String[] opcoes = {"a", "b", "c", "d"};
-//                    String[] alternativas = new String[4];
-//                    System.out.print("Digite a pergunta: ");
-//                    String pergunta = scanner.nextLine();
-//                    System.out.println("Digite as alternativas: ");
-//                    for (int i = 0; i < alternativas.length; i++) {
-//                        System.out.println("Digite a alternativa " + opcoes[i] + ": ");
-//                        alternativas[i] = scanner.nextLine();
-//                    }
-//                    System.out.print("Digite a alternativa correta: ");
-//                    for (int i = 0; i < alternativas.length; i++) {
-//                        System.out.println(opcoes[i] + " - " + alternativas[i]);
-//                    }
-//
-//                    String resposta = scanner.nextLine();
-//                    System.out.print("Digite a fase (Estrutura de Dados, Algoritmos, Banco de Dados, Redes): ");
-//                    String fase = scanner.nextLine();
-//
-//
-//                    jogo.adicionarPergunta(pergunta, resposta, fase);
+
                     break;
-                // ..
                 case 2:
-                    jogo.jogar();
+                    limparConsole();
+                    jogoService.jogar();
                     break;
                 case 3:
                     System.out.println("Saindo...");
@@ -54,4 +38,11 @@ public class Main {
             }
         }
     }
+
+    public static void limparConsole() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
+
 }
