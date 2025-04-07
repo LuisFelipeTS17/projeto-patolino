@@ -1,19 +1,47 @@
 package com.senac.service;
 
+import com.senac.model.GerenciadorDeArquivos;
 import com.senac.model.Pergunta;
-import java.io.*;
+
 import java.util.*;
 
 public class PerguntaService {
     private List<Pergunta> perguntas = new ArrayList<>();
     private int faseAtual = 1;
-    private static final String ARQUIVO = "src/main/resources/perguntas.txt";
     private static List<String> fases = new ArrayList<>();
-    private static Map<String, Integer> prioridadeFases = new HashMap<>();
+    private final Map<String, Integer> prioridadeFases = new HashMap<>();
+    private final GerenciadorDeArquivos gerenciadorDeArquivos;
+    String[] frasesAcerto = {
+            "Pelo vórtice do saber arcano... Você acertou, jovem aprendiz!",
+            "O Mago Implacável te saúda! Esse acerto ecoará por dimensões!",
+            "Com um estalar de dedos e sabedoria... a resposta correta surgiu!",
+            "Você canalizou a essência da verdade! Muito bem, pequeno conjurador!",
+            "Celestia sorri para ti... pois sua mente brilhou como o sol negro!",
+            "Pelas pedras de Prophynia! Você dominou esta pergunta com maestria!",
+            "O Místico Mago reconhece seu poder... continue nesse caminho!",
+            "O cubo mágico explodiu em celebração! Acerto mágico registrado!",
+            "Você provou ser digno do poder infinito... por enquanto.",
+            "Ahh... até os dragões pararam para aplaudir essa resposta!"
+    };
 
-    public PerguntaService() {
+    String[] frasesErro = {
+            "Sob o olhar do necromante... essa resposta caiu em ruína.",
+            "As estrelas se alinharam... mas não a seu favor.",
+            "O Garlon riu... e a resposta se perdeu no abismo.",
+            "Tsc, tsc... nem todo aprendiz acerta sempre. Tente de novo.",
+            "O fogo sagrado não te iluminou desta vez.",
+            "O cubo mágico tremeu... e explodiu em vergonha.",
+            "O mago observa em silêncio... e nega com a cabeça.",
+            "Ahh, jovem tolo... até um dragão saberia essa.",
+            "A Escada Prateada não se ergueu... você tropeçou no primeiro degrau.",
+            "Você dormiu como Patolino por três dias... e ainda respondeu errado!"
+    };
+
+
+    public PerguntaService(GerenciadorDeArquivos gerenciadorDeArquivos) {
+        this.gerenciadorDeArquivos = gerenciadorDeArquivos;
         carregarPrioridades();
-        carregarDados();
+        this.perguntas = gerenciadorDeArquivos.carregarPerguntas();
         organizarFases();
     }
 
@@ -36,89 +64,49 @@ public class PerguntaService {
         fases.sort(Comparator.comparingInt(f -> prioridadeFases.getOrDefault(f, Integer.MAX_VALUE)));
     }
 
-//    public void adicionarPergunta(String pergunta, String[] alternativas, String resposta, String fase) {
-//        perguntas.add(new Pergunta(pergunta, alternativas, resposta, fase));
-//        salvarDados();
-//    }
-
-    public void jogar() {
-        int vidas = 3;
-        if (faseAtual > fases.size()) {
-            System.out.println("Parabéns! Você concluiu todas as fases!");
-        }
-
+    public List<Pergunta> getPerguntasDaFaseAtual() {
+        if (faseAtual > fases.size()) return Collections.emptyList();
         String faseNome = fases.get(faseAtual - 1);
-
-        List<Pergunta> perguntasFase = new ArrayList<>(perguntas.stream()
+        return new ArrayList<>(perguntas.stream()
                 .filter(p -> p.getFase().equalsIgnoreCase(faseNome))
                 .toList());
-
-        if (perguntasFase.isEmpty()) {
-            System.out.println("Nenhuma pergunta encontrada para esta fase.");
-        }
-
-        Collections.shuffle(perguntasFase);
-        Scanner scanner = new Scanner(System.in);
-        int acertos = 0;
-
-        for (Pergunta p : perguntasFase) {
-            System.out.println("Pergunta: " + p.getPergunta());
-            Map<String, String> alternativasMap = new HashMap<>();
-            String[] alternativas = {"a", "b", "c", "d"};
-
-            for (int i = 0; i < p.getAlternativas().length; i++) {
-                alternativasMap.put(alternativas[i], p.getAlternativas()[i]);
-                System.out.println(alternativas[i] + ") " + p.getAlternativas()[i]);
-            }
-            System.out.print("Resposta: ");
-            String respostaUsuario = scanner.nextLine();
-
-            if (alternativasMap.get(respostaUsuario).equalsIgnoreCase(p.getResposta())) {
-                System.out.println("Resposta correta!");
-                acertos++;
-            } else {
-                vidas--;
-                System.out.println("Resposta errada! A resposta correta era: " + p.getResposta());
-                if ( vidas == 0 ) {
-                    System.out.println("Você perdeu todas as vidas! O jogo recomeçara!");
-                    vidas = 3;
-                    faseAtual--;
-                    break;
-                }
-            }
-        }
-
-        if (acertos == perguntasFase.size()) {
-            System.out.println("Você avançou para a próxima fase!");
-            faseAtual++;
-        } else {
-            System.out.println("Tente novamente para avançar de fase.");
-        }
     }
 
-    private void salvarDados() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO))) {
-            for (Pergunta p : perguntas) {
-                writer.write(p.getPergunta() + " | " + Arrays.stream(p.getAlternativas()).toList() + p.getResposta() + " | " + p.getFase() + "\n");
-            }
-        } catch (IOException e) {
-            System.out.println("Erro ao salvar dados.");
-        }
+    public String getMensagemDeAcerto(){
+        Random random = new Random();
+        int index = random.nextInt(frasesAcerto.length);
+        return frasesAcerto[index];
     }
 
-    private void carregarDados() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(ARQUIVO))) {
-            perguntas.clear();
-            String linha;
-            while ((linha = reader.readLine()) != null) {
-                String[] partes = linha.split("\\|");
-                if (partes.length == 7) {
-                    String[] alternativas = {partes[1].trim(), partes[2].trim(), partes[3].trim(), partes[4].trim()};
-                    perguntas.add(new Pergunta(partes[0].trim(),  alternativas, partes[5].trim(), partes[6].trim()));
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Nenhuma pergunta encontrada. Começando novo jogo.");
-        }
+    public String getMensagemDeErro(){
+        Random random = new Random();
+        int index = random.nextInt(frasesErro.length);
+        return frasesErro[index];
     }
+
+    public String getFaseAtual(){
+        return faseAtual + " - " + fases.get(faseAtual -1);
+    }
+
+    public void avancarFase() {
+        faseAtual++;
+    }
+
+    public void reiniciarFase() {
+        faseAtual--;
+    }
+
+    public boolean jogoConcluido() {
+        return faseAtual > fases.size();
+    }
+
+    public void salvar() {
+        gerenciadorDeArquivos.salvarPerguntas(perguntas);
+    }
+
+    public void adicionarPergunta(Pergunta p) {
+        perguntas.add(p);
+        salvar();
+    }
+
 }
