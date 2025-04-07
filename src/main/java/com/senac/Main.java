@@ -1,6 +1,5 @@
 package com.senac;
 
-import java.io.IOException;
 import java.util.Scanner;
 
 import com.senac.model.GerenciadorDeArquivos;

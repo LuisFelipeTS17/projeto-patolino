@@ -25,8 +25,6 @@ public class PatolinoGm {
             escrever("E entre do reino encantada dos códigos com Patolino!");
             escrever("🔥O desafio vai começar...🔥");
             System.out.println("\n==========================================\n");
-
-    
     }
         public static void escrever(String texto){
             try{
