@@ -60,7 +60,7 @@ public class JogoService {
                 }
             }
 
-            if (acertos == perguntasFase.size() - 2) {
+            if (acertos >= perguntasFase.size() - 2) {
                 System.out.println("Você avançou para a próxima fase!");
                 perguntaService.avancarFase();
             } else {
