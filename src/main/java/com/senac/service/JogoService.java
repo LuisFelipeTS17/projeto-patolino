@@ -14,7 +14,16 @@ public class JogoService {
 
     public void jogar() {
         Scanner scanner = new Scanner(System.in);
-        int vidas = 3;
+        System.out.print("Digite o número de jogadores (1 a 4): ");
+        int numJogadores = Integer.parseInt(scanner.nextLine());
+
+        if (numJogadores < 1 || numJogadores > 4) {
+            System.out.println("Número de jogadores inválido. Encerrando o jogo.");
+            return;
+        }
+
+        int[] vidasJogadores = new int[numJogadores];
+        Arrays.fill(vidasJogadores, 3);
 
         while (!perguntaService.jogoConcluido()) {
             List<Pergunta> perguntasFase = perguntaService.getPerguntasDaFaseAtual();
@@ -25,50 +34,81 @@ public class JogoService {
             }
 
             Collections.shuffle(perguntasFase);
-            int acertos = 0;
+            int[] acertosPorJogador = new int[numJogadores];
+
             System.out.println("===============================");
-            System.out.println("Fase "+perguntaService.getFaseAtual()+" - "+vidas+" vidas restantes");
-            for (Pergunta p : perguntasFase) {
+            System.out.println("Fase " + perguntaService.getFaseAtual());
+
+            for (int i = 0; i < numJogadores; i++) {
+                if (vidasJogadores[i] <= 0) {
+                    System.out.println("Jogador " + (i + 1) + " está fora do jogo!");
+                    continue;
+                }
+
+                Pergunta pergunta = perguntasFase.get(new Random().nextInt(perguntasFase.size()));
                 System.out.println("===============================");
-                System.out.println("Pergunta: " + p.getPergunta());
+                System.out.println("Jogador " + (i + 1) + " - " + vidasJogadores[i] + " vidas restantes");
+                System.out.println("Pergunta: " + pergunta.getPergunta());
+
                 String[] alternativas = {"a", "b", "c", "d"};
                 Map<String, String> alternativasMap = new HashMap<>();
-
-                for (int i = 0; i < p.getAlternativas().length; i++) {
-                    alternativasMap.put(alternativas[i], p.getAlternativas()[i]);
-                    System.out.println(alternativas[i] + ") " + p.getAlternativas()[i]);
+                for (int j = 0; j < pergunta.getAlternativas().length; j++) {
+                    alternativasMap.put(alternativas[j], pergunta.getAlternativas()[j]);
+                    System.out.println(alternativas[j] + ") " + pergunta.getAlternativas()[j]);
                 }
+
                 System.out.print("Resposta: ");
                 String respostaUsuario = scanner.nextLine();
 
-                if (alternativasMap.get(respostaUsuario).equalsIgnoreCase(p.getResposta())) {
-                    System.out.println("===============================");
+                if (alternativasMap.get(respostaUsuario) != null &&
+                        alternativasMap.get(respostaUsuario).equalsIgnoreCase(pergunta.getResposta())) {
                     System.out.println("Resposta correta!");
                     System.out.println(perguntaService.getMensagemDeAcerto());
-                    acertos++;
+                    acertosPorJogador[i]++;
                 } else {
-                    System.out.println("===============================");
-                    System.out.println("Resposta errada! A resposta correta era: " + p.getResposta());
+                    System.out.println("Resposta errada! A resposta correta era: " + pergunta.getResposta());
                     System.out.println(perguntaService.getMensagemDeErro());
-                    vidas--;
-                    if (vidas == 0) {
-                        System.out.println("Você perdeu todas as vidas! O jogo recomeçara!");
-                        vidas = 3;
-                        perguntaService.reiniciarFase();
-                        break;
+                    vidasJogadores[i]--;
+                    if (vidasJogadores[i] == 0) {
+                        System.out.println("Jogador " + (i + 1) + " perdeu todas as vidas!");
                     }
                 }
             }
 
-            if (acertos >= perguntasFase.size() - 2) {
-                System.out.println("Você avançou para a próxima fase!");
+            boolean todosPerderam = true;
+            for (int vidas : vidasJogadores) {
+                if (vidas > 0) {
+                    todosPerderam = false;
+                    break;
+                }
+            }
+
+            if (todosPerderam) {
+                System.out.println("Todos os jogadores perderam. O jogo recomeçará!");
+                Arrays.fill(vidasJogadores, 3);
+                perguntaService.reiniciarFase();
+                continue;
+            }
+
+            int totalJogadoresVivos = 0;
+            int totalAcertos = 0;
+            for (int i = 0; i < numJogadores; i++) {
+                if (vidasJogadores[i] > 0) {
+                    totalJogadoresVivos++;
+                    totalAcertos += acertosPorJogador[i];
+                }
+            }
+
+            if (totalJogadoresVivos > 0 && totalAcertos >= totalJogadoresVivos) {
+                System.out.println("Parabéns! Vocês avançaram para a próxima fase!");
                 perguntaService.avancarFase();
             } else {
-                System.out.println("Tente novamente para avançar de fase.");
+                System.out.println("Nem todos foram bem... Tentem novamente!");
             }
         }
+
         if (perguntaService.jogoConcluido()) {
-            System.out.println("Parabéns! Você concluiu todas as fases!");
+            System.out.println("Parabéns! Todos os jogadores concluíram o jogo!");
         }
     }
 }
