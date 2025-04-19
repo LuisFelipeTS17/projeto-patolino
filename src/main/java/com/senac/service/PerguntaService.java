@@ -88,6 +88,16 @@ public class PerguntaService {
         return faseAtual + " - " + fases.get(faseAtual -1);
     }
 
+    public List<String> getFases() {
+        return fases;
+    }
+    public List<Pergunta> getPerguntasDaFase(String faseNome) {
+        return perguntas.stream()
+                .filter(p -> p.getFase().equalsIgnoreCase(faseNome))
+                .toList();
+    }
+
+
     public void avancarFase() {
         faseAtual++;
     }
