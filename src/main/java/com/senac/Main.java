@@ -14,22 +14,18 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("1 - Adicionar Pergunta");
-            System.out.println("2 - Jogar");
-            System.out.println("3 - Sair");
+            System.out.println("1 - Jogar");
+            System.out.println("2 - Sair");
             System.out.print("Escolha: ");
             int escolha = scanner.nextInt();
             scanner.nextLine();
 
             switch (escolha) {
                 case 1:
-
-                    break;
-                case 2:
                     limparConsole();
                     jogoService.jogar();
                     break;
-                case 3:
+                case 2:
                     System.out.println("Saindo...");
                     return;
                 default:
