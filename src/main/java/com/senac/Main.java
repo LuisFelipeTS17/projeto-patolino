@@ -14,7 +14,8 @@ public class Main {
         while (true) {
             System.out.println("1 - Adicionar Pergunta");
             System.out.println("2 - Jogar");
-            System.out.println("3 - Sair");
+            System.out.println("3 - Ver Ranking");
+            System.out.println("4 - Sair");
             System.out.print("Escolha: ");
             int escolha = scanner.nextInt();
             scanner.nextLine();
@@ -47,6 +48,9 @@ public class Main {
                     jogo.jogar();
                     break;
                 case 3:
+                    jogo.verRanking();
+                    break;
+                case 4:
                     System.out.println("Saindo...");
                     return;
                 default:

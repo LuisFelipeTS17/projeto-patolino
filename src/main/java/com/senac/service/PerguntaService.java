@@ -134,6 +134,29 @@ public class PerguntaService {
             System.out.println("Erro ao salvar no ranking.");
         }
     }
+    public void verRanking() {
+        List<Jogador> ranking = carregarRanking();
+        ranking.sort((j1, j2) -> Integer.compare(j2.getPontuacao(), j1.getPontuacao())); // maior para menor
+
+        System.out.println("\n🏆 Ranking dos Jogadores:");
+        int posicao = 1;
+        for (Jogador jogador : ranking) {
+            String medalha = switch (posicao) {
+                case 1 -> "🥇"; // Primeiro lugar
+                case 2 -> "🥈"; // Segundo lugar
+                case 3 -> "🥉"; // Terceiro lugar
+                default -> posicao + "º"; // Outros colocados
+            };
+
+            System.out.println(medalha + " - " + jogador.getNick() + " (" + jogador.getPontuacao() + " pontos)");
+            posicao++;
+        }
+        if (ranking.isEmpty()) {
+            System.out.println("Nenhum jogador no ranking ainda.");
+        }
+        System.out.println();
+    }
+
 
     private List<Jogador> carregarRanking() {
         List<Jogador> ranking = new ArrayList<>();
