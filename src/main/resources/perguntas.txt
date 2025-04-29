@@ -16,3 +16,43 @@ Qual palavra-chave é usada para criar uma classe em Java? | create | define | c
 Qual é o tipo de retorno de um método que não retorna nada? | null | empty | void | 0 | void | POO
 Qual palavra-chave usamos para criar um objeto de uma classe? | build | new | object | create | new | POO
 Qual é a função do bloco try-catch? | Criar variáveis | Repetir código | Tratar exceções | Executar um bloco de código | Tratar exceções | POO
+O que é necessário para compilar um código Java? | Um navegador | Um compilador | Um banco de dados | Um servidor web | Um compilador | Java Básico
+Qual é a extensão dos arquivos Java compilados? | .java | .txt | .class | .exe | .class | Java Básico
+Qual empresa criou a linguagem Java? | Microsoft | Oracle | Sun Microsystems | IBM | Sun Microsystems | Java Básico
+Em que ano Java foi lançado? | 1990 | 1995 | 2000 | 2005 | 1995 | Java Básico
+Qual comando compila um arquivo Java? | run | javac | java | compile | javac | Java Básico
+Qual comando executa um arquivo `.class` em Java? | execute | run | java | javac | java | Java Básico
+Qual tipo de dado armazena números inteiros? | float | int | char | boolean | int | Variáveis
+Como declaramos uma variável que nunca muda? | var | let | final | static | final | Variáveis
+Qual nome de variável é válido em Java? | 1idade | nome-aluno | nome_aluno | @nome | nome_aluno | Variáveis
+Qual dos seguintes tipos primitivos armazena texto? | String | char | int | float | String | Variáveis
+O que significa a palavra `null` em Java? | Um número | Um erro | Ausência de valor | Verdadeiro | Ausência de valor | Variáveis
+Qual é o valor padrão de um boolean? | true | false | null | 0 | false | Variáveis
+Qual operador representa a negação em Java? | ! | && | == | != | ! | Operadores
+Qual operador realiza o módulo (resto da divisão)? | % | / | * | & | % | Operadores
+O que retorna `5 == 5` em Java? | true | false | 0 | erro | true | Operadores
+O que `!=` significa em Java? | Atribuição | Igualdade | Diferente | Negação | Diferente | Operadores
+Qual operador é usado para incremento? | ++ | += | -- | <> | ++ | Operadores
+O que o operador `&&` representa? | OU | E | XOR | NOT | E | Operadores
+O que significa POO? | Programação em Objetos Orientados | Programação Orientada a Objetos | Programação Obsoleta e Objetiva | Protocolo Orientado a Objetos | Programação Orientada a Objetos | POO
+O que é uma classe em Java? | Um método | Uma variável | Um modelo de objeto | Um tipo primitivo | Um modelo de objeto | POO
+Qual palavra-chave define herança em Java? | inherit | super | extends | base | extends | POO
+Como se chama o processo de ocultar detalhes internos? | Herança | Encapsulamento | Abstração | Polimorfismo | Encapsulamento | POO
+Qual é o pilar da POO que permite múltiplas formas de um método? | Herança | Abstração | Polimorfismo | Reutilização | Polimorfismo | POO
+O que é um objeto? | Um tipo primitivo | Uma instância de classe | Um método | Um pacote | Uma instância de classe | POO
+O que a estrutura `if` faz? | Repetição | Seleção condicional | Loop infinito | Declara variável | Seleção condicional | Controle de fluxo
+Qual estrutura executa ao menos uma vez mesmo que a condição seja falsa? | for | while | do-while | if | do-while | Controle de fluxo
+Qual comando encerra um loop imediatamente? | return | continue | break | exit | break | Controle de fluxo
+O que o `else` representa em um `if`? | Outra condição | Fim do código | Alternativa ao if | Nova variável | Alternativa ao if | Controle de fluxo
+Quando usamos `switch`? | Para repetir código | Para testar várias condições | Para criar objetos | Para loops infinitos | Para testar várias condições | Controle de fluxo
+Qual estrutura é usada quando se sabe o número de repetições? | for | while | if | switch | for | Controle de fluxo
+Qual palavra-chave cria uma nova classe? | define | class | create | type | class | Classes
+Como criamos um objeto de uma classe? | class obj = new Classe(); | new Classe(); | object = new Classe(); | new obj(Classe); | new Classe(); | Classes
+Qual é o método chamado ao criar um objeto? | main | toString | constructor | construtor | construtor | Classes
+Qual modificador de acesso permite acesso de qualquer lugar? | private | default | public | protected | public | Classes
+Qual função o método `toString()` tem? | Executar código | Comparar objetos | Representar texto de um objeto | Finalizar objeto | Representar texto de um objeto | Classes
+Como se declara um array de inteiros em Java? | int arr[]; | int array; | array int[]; | int = array[]; | int arr[]; | Arrays
+Como acessamos o terceiro elemento de um array `valores[]`? | valores[2] | valores(3) | valores[3] | valores{3} | valores[2] | Arrays
+Qual é o índice inicial de um array em Java? | 1 | 0 | -1 | Depende do tipo | 0 | Arrays
+Como saber o tamanho de um array? | array.size | array.length | length(array) | getLength(array) | array.length | Arrays
+O que acontece se acessar um índice fora do array? | Retorna 0 | Ignora | Lança exceção | Repete último valor | Lança exceção | Arrays
