@@ -16,3 +16,43 @@ Qual palavra-chave é usada para criar uma classe em Java? | create | define | c
 Qual é o tipo de retorno de um método que não retorna nada? | null | empty | void | 0 | void | POO
 Qual palavra-chave usamos para criar um objeto de uma classe? | build | new | object | create | new | POO
 Qual é a função do bloco try-catch? | Criar variáveis | Repetir código | Tratar exceções | Executar um bloco de código | Tratar exceções | POO
+Qual o resultado de 10 / 2 em Java? | 5 | 20 | 10 | 2 | 2 | Java Básico
+Qual palavra-chave usamos para declarar variáveis? | define | var | let | int | int | Variáveis
+Qual o resultado de 10 / 2 em Java? | 5 | 2 | 20 | 10 | 2 | Java Básico
+Qual palavra-chave torna um método comum a todos os objetos? | static | super | final | this | static | POO
+Como criamos um objeto? | this | object | new | super | new | POO
+Como comentamos múltiplas linhas em Java? | // | /* ... */ | # | <!-- --> | /* ... */ | Java Básico
+Qual tipo armazena texto? | char | word | String | text | String | Variáveis
+Qual estrutura repete enquanto condição for verdadeira? | if | switch | for | while | while | Estruturas de controle
+Qual função imprime texto no console? | System.out.println() | write() | echo | printf() | System.out.println() | Java Básico
+O que é polimorfismo? | Métodos com mesmo nome se comportando diferente | Herança múltipla | Atribuição dinâmica | Uso de interfaces | Métodos com mesmo nome se comportando diferente | POO
+Qual o resultado de 10 / 2 em Java? | 2 | 10 | 20 | 5 | 2 | Java Básico
+Qual palavra-chave usamos para declarar variáveis? | int | let | var | define | int | Variáveis
+O que o operador != representa? | Menor | Igual | Maior | Diferente | Diferente | Operadores
+Qual operador representa AND lógico? | ! | & | || | && | && | Operadores
+É possível alterar o valor de uma variável final? | Não | Sim | Apenas em métodos | Somente em classes | Não | Variáveis
+Qual operador representa AND lógico? | || | ! | & | && | && | Operadores
+Qual estrutura é usada para decisão binária? | for | if | while | switch | if | Estruturas de controle
+É possível alterar o valor de uma variável final? | Sim | Apenas em métodos | Não | Somente em classes | Não | Variáveis
+Como se concatena texto em Java? | concat() | * | & | + | + | Variáveis
+Como criamos um objeto? | object | this | super | new | new | POO
+Qual tipo armazena um único caractere? | char | boolean | String | byte | char | Variáveis
+Como comentamos múltiplas linhas em Java? | // | <!-- --> | /* ... */ | # | /* ... */ | Java Básico
+O que é encapsulamento? | Herdar atributos | Instanciar objetos | Ocultar detalhes internos de implementação | Sobrescrever métodos | Ocultar detalhes internos de implementação | POO
+O que é polimorfismo? | Métodos com mesmo nome se comportando diferente | Atribuição dinâmica | Uso de interfaces | Herança múltipla | Métodos com mesmo nome se comportando diferente | POO
+O que é polimorfismo? | Atribuição dinâmica | Métodos com mesmo nome se comportando diferente | Herança múltipla | Uso de interfaces | Métodos com mesmo nome se comportando diferente | POO
+O que faz o comando continue? | Pula para próxima iteração | Reinicia o loop | Sai do loop | Interrompe o programa | Pula para próxima iteração | Estruturas de controle
+Qual palavra define herança em Java? | inherits | extends | super | this | extends | POO
+Qual palavra-chave torna um método comum a todos os objetos? | final | super | this | static | static | POO
+Qual tipo armazena um único caractere? | byte | char | boolean | String | char | Variáveis
+Qual estrutura repete enquanto condição for verdadeira? | switch | while | for | if | while | Estruturas de controle
+Qual palavra-chave usamos para declarar variáveis? | define | int | let | var | int | Variáveis
+Qual função imprime texto no console? | echo | write() | System.out.println() | printf() | System.out.println() | Java Básico
+É possível alterar o valor de uma variável final? | Sim | Não | Somente em classes | Apenas em métodos | Não | Variáveis
+Qual tipo armazena um único caractere? | String | byte | boolean | char | char | Variáveis
+Qual estrutura é usada para decisão binária? | switch | if | for | while | if | Estruturas de controle
+Como comentamos múltiplas linhas em Java? | /* ... */ | <!-- --> | // | # | /* ... */ | Java Básico
+Qual desses é um tipo numérico? | double | String | char | boolean | double | Java Básico
+Qual o resultado de 10 / 2 em Java? | 5 | 2 | 20 | 10 | 2 | Java Básico
+Qual tipo representa verdadeiro ou falso? | char | double | boolean | int | boolean | Java Básico
+Como se faz incremento em Java? | +1 | ++ | += | -- | ++ | Operadores
