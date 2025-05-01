@@ -4,18 +4,21 @@ public class Jogador {
     private String nick;
     private int pontuacao;
 
-    public Jogador(String nick, int pontucao) {
+    public Jogador(String nick, int pontuacao) {
         this.nick = nick;
         this.pontuacao = pontuacao;
-        System.out.println("[DEBUG] Jogador criado" + nick + ", Pontuação:" + pontuacao);
     }
 
-    public String getNick(){
+    public String getNick() {
         return nick;
     }
 
     public int getPontuacao() {
         return pontuacao;
+    }
+
+    public void setPontuacao(int pontuacao) {
+        this.pontuacao = pontuacao;
     }
 
     @Override
@@ -24,8 +27,23 @@ public class Jogador {
     }
 
     public static Jogador fromString(String linha) {
+        if (linha == null || linha.trim().isEmpty()) {
+            throw new IllegalArgumentException("Linha inválida ou vazia.");
+        }
+
         String[] partes = linha.split("\\|");
-        System.out.println("[DEBUG] Convertendo linha para jogador" + linha); // depuração
-        return new Jogador(partes[0], Integer.parseInt(partes[1]));
+        if (partes.length != 2) {
+            throw new IllegalArgumentException("Formato inválido para a linha: " + linha);
+        }
+
+        String nick = partes[0].trim();
+        int pontuacao;
+        try {
+            pontuacao = Integer.parseInt(partes[1].trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Pontuação inválida na linha: " + linha);
+        }
+
+        return new Jogador(nick, pontuacao);
     }
 }
