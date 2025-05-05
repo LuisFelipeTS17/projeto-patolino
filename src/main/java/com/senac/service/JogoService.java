@@ -7,17 +7,18 @@ import java.util.*;
 public class JogoService {
 
     private final PerguntaService perguntaService;
+    private final RankingService rankingService;
 
-    public JogoService(PerguntaService perguntaService) {
+    public JogoService(PerguntaService perguntaService, RankingService rankingService) {
         this.perguntaService = perguntaService;
+        this.rankingService = rankingService;
     }
 
-    public void jogar() {
+    public void jogar(String[] nicks) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Digite o número de jogadores (1 a 4): ");
-        int numJogadores = Integer.parseInt(scanner.nextLine());
+        int numJogadores = nicks.length;
 
-        if (numJogadores < 1 || numJogadores > 5) {
+        if (numJogadores < 1 || numJogadores > 4) {
             System.out.println("Número de jogadores inválido. Encerrando o jogo.");
             return;
         }
@@ -25,18 +26,19 @@ public class JogoService {
         int[] vidasJogadores = new int[numJogadores];
         Arrays.fill(vidasJogadores, 3);
 
+        int[] pontuacoes = new int[numJogadores]; // Inicializar corretamente o array de pontuações
+
         Map<Integer, Integer> fasePorJogador = new HashMap<>();
         for (int i = 0; i < numJogadores; i++) fasePorJogador.put(i, 1);
 
         Map<Integer, Set<Pergunta>> perguntasRespondidas = new HashMap<>();
         for (int i = 0; i < numJogadores; i++) perguntasRespondidas.put(i, new HashSet<>());
 
-
         while (true) {
             List<Pergunta> perguntasFase = perguntaService.getPerguntasDaFaseAtual();
 
+            // Verificar se o jogo foi concluído
             boolean jogoConcluido = true;
-
             for (int i = 0; i < numJogadores; i++) {
                 if (vidasJogadores[i] > 0 && fasePorJogador.get(i) <= perguntaService.getFases().size()) {
                     jogoConcluido = false;
@@ -45,13 +47,14 @@ public class JogoService {
             }
 
             if (jogoConcluido) {
-                System.out.println("Parabéns! Todos os jogadores concluíram o jogo!");
-                break;
+                System.out.println("Parabéns! Todos os jogadores concluíram o jogo ou foram eliminados!");
+                atualizarRankingFinal(nicks, pontuacoes, vidasJogadores, fasePorJogador);
+                break; // Sair do loop principal
             }
 
             for (int i = 0; i < numJogadores; i++) {
                 if (vidasJogadores[i] <= 0 || fasePorJogador.get(i) > perguntaService.getFases().size()) {
-                    System.out.println("Jogador " + (i + 1) + " está fora ou concluiu o jogo.");
+                    System.out.println("Jogador " + nicks[i] + " está fora ou concluiu o jogo.");
                     continue;
                 }
 
@@ -61,7 +64,8 @@ public class JogoService {
                 perguntasDisponiveis.removeAll(perguntasRespondidas.get(i));
 
                 if (perguntasDisponiveis.isEmpty()) {
-                    System.out.println("Jogador " + (i + 1) + " já respondeu todas as perguntas da fase.");
+                    System.out.println("Jogador " + nicks[i] + " já respondeu todas as perguntas da fase.");
+                    fasePorJogador.put(i, faseAtualJogador + 1); // Avançar para a próxima fase
                     continue;
                 }
 
@@ -70,7 +74,7 @@ public class JogoService {
                 perguntasRespondidas.get(i).add(pergunta);
 
                 System.out.println("===============================");
-                System.out.println("Jogador " + (i + 1) + " - Fase " + faseAtualJogador + ": " + nomeFase + " | " + vidasJogadores[i] + " vidas");
+                System.out.println("Jogador " + nicks[i] + " - Fase " + faseAtualJogador + ": " + nomeFase + " | " + vidasJogadores[i] + " vidas");
                 System.out.println("Pergunta: " + pergunta.getPergunta());
 
                 String[] letras = {"a", "b", "c", "d"};
@@ -80,46 +84,14 @@ public class JogoService {
                     System.out.println(letras[j] + ") " + pergunta.getAlternativas()[j]);
                 }
 
-                String respostaUsuario = null;
-                final boolean[] respondeu = {false};
+                System.out.print("Resposta: ");
+                String respostaUsuario = scanner.nextLine().trim();
 
-                System.out.println("Você tem 15 segundos para responder...");
-
-                System.out.print("\rTempo restante: 15 segundos");
-                System.out.print("\rResposta: ");
-
-
-                Thread cronometro = new Thread(() -> {
-                    for (int s = 15; s >= 0; s--) {
-                        if (respondeu[0]) return;
-                        System.out.print("\rTempo restante: " + s + " segundos");
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            return;
-                        }
-                    }
-                });
-
-
-                cronometro.start();
-
-                long inicio = System.currentTimeMillis();
-                while ((System.currentTimeMillis() - inicio) < 15000 && !respondeu[0]) {
-                    if (scanner.hasNextLine()) {
-                        respostaUsuario = scanner.nextLine().trim();
-                        respondeu[0] = true;
-                    }
-                }
-
-                cronometro.interrupt();
-                System.out.println();
-
-                if (!respondeu[0] || !mapa.containsKey(respostaUsuario)) {
-                    System.out.println("Resposta inválida ou tempo esgotado! Perdeu 1 vida.");
+                if (!mapa.containsKey(respostaUsuario)) {
+                    System.out.println("Resposta inválida! Perdeu 1 vida.");
                     vidasJogadores[i]--;
                     if (vidasJogadores[i] == 0) {
-                        System.out.println("Jogador " + (i + 1) + " está eliminado!");
+                        System.out.println("Jogador " + nicks[i] + " está eliminado!");
                     }
                     continue;
                 }
@@ -127,15 +99,29 @@ public class JogoService {
                 if (mapa.get(respostaUsuario).equalsIgnoreCase(pergunta.getResposta())) {
                     System.out.println("Resposta correta!");
                     System.out.println(perguntaService.getMensagemDeAcerto());
+                    pontuacoes[i] += 10; // Incrementar pontuação por resposta correta
                     fasePorJogador.put(i, faseAtualJogador + 1);
                 } else {
                     System.out.println("Resposta errada! A certa era: " + pergunta.getResposta());
                     System.out.println(perguntaService.getMensagemDeErro());
                     vidasJogadores[i]--;
                     if (vidasJogadores[i] == 0) {
-                        System.out.println("Jogador " + (i + 1) + " está eliminado!");
+                        System.out.println("Jogador " + nicks[i] + " está eliminado!");
                     }
                 }
+            }
+        }
+    }
+
+    private void atualizarRankingFinal(String[] nicks, int[] pontuacoes, int[] vidasJogadores, Map<Integer, Integer> fasePorJogador) {
+        for (int i = 0; i < nicks.length; i++) {
+            if (vidasJogadores[i] > 0) {
+                pontuacoes[i] += (fasePorJogador.get(i) - 1) * 10; // Calcular pontuação final com base nas fases concluídas
+            }
+            try {
+                rankingService.atualizarRanking(nicks[i], pontuacoes[i]); // Atualizar ranking
+            } catch (Exception e) {
+                System.out.println("Erro ao atualizar o ranking para o jogador " + nicks[i] + ": " + e.getMessage());
             }
         }
     }
