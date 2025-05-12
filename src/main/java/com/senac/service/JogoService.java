@@ -26,7 +26,7 @@ public class JogoService {
         int[] vidasJogadores = new int[numJogadores];
         Arrays.fill(vidasJogadores, 3);
 
-        int[] pontuacoes = new int[numJogadores]; // Inicializar corretamente o array de pontuações
+        int[] pontuacoes = new int[numJogadores];
 
         Map<Integer, Integer> fasePorJogador = new HashMap<>();
         for (int i = 0; i < numJogadores; i++) fasePorJogador.put(i, 1);
@@ -37,7 +37,6 @@ public class JogoService {
         while (true) {
             List<Pergunta> perguntasFase = perguntaService.getPerguntasDaFaseAtual();
 
-            // Verificar se o jogo foi concluído
             boolean jogoConcluido = true;
             for (int i = 0; i < numJogadores; i++) {
                 if (vidasJogadores[i] > 0 && fasePorJogador.get(i) <= perguntaService.getFases().size()) {
@@ -65,7 +64,7 @@ public class JogoService {
 
                 if (perguntasDisponiveis.isEmpty()) {
                     System.out.println("Jogador " + nicks[i] + " já respondeu todas as perguntas da fase.");
-                    fasePorJogador.put(i, faseAtualJogador + 1); // Avançar para a próxima fase
+                    fasePorJogador.put(i, faseAtualJogador + 1);
                     continue;
                 }
 
@@ -99,7 +98,7 @@ public class JogoService {
                 if (mapa.get(respostaUsuario).equalsIgnoreCase(pergunta.getResposta())) {
                     System.out.println("Resposta correta!");
                     System.out.println(perguntaService.getMensagemDeAcerto());
-                    pontuacoes[i] += 10; // Incrementar pontuação por resposta correta
+                    pontuacoes[i] += 10;
                     fasePorJogador.put(i, faseAtualJogador + 1);
                 } else {
                     System.out.println("Resposta errada! A certa era: " + pergunta.getResposta());
