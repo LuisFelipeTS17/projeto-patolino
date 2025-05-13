@@ -1,2 +1,2 @@
-1|10
-jalimmamei|10
+Eric|100
+Lucas|100

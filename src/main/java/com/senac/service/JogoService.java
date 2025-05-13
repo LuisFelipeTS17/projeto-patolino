@@ -2,9 +2,10 @@ package com.senac.service;
 
 import com.senac.model.Pergunta;
 
+import javax.swing.*;
 import java.util.*;
 
-public class JogoService {
+public class JogoService extends JFrame {
 
     private final PerguntaService perguntaService;
     private final RankingService rankingService;
