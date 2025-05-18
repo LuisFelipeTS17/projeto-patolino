@@ -10,9 +10,30 @@ public class JogoService extends JFrame {
     private final PerguntaService perguntaService;
     private final RankingService rankingService;
 
+    private String[] nicks;
+    private int jogadorAtual = 0;
+    private int[] vidasJogadores;
+    private int[] pontuacoes;
+    private Map<Integer, Integer> fasePorJogador;
+    private Map<Integer, Set<Pergunta>> perguntasRespondidas;
+
+    private JLabel perguntaLabel;
+    private JRadioButton[] alternativasRadio;
+    private ButtonGroup grupoAlternativas;
+    private JButton responderButton;
+    private JLabel statusLabel;
+
+    private Pergunta perguntaAtual;
+
     public JogoService(PerguntaService perguntaService, RankingService rankingService) {
         this.perguntaService = perguntaService;
         this.rankingService = rankingService;
+
+        setTitle("Jogo de Perguntas");
+        setSize(600, 400);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
     }
 
     public void jogar(String[] nicks) {
