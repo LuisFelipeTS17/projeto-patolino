@@ -26,7 +26,7 @@ Qual tipo armazena texto? | char | word | String | text | String | Variáveis
 Qual estrutura repete enquanto condição for verdadeira? | if | switch | for | while | while | Estruturas de controle
 Qual função imprime texto no console? | System.out.println() | write() | echo | printf() | System.out.println() | Java Básico
 O que é polimorfismo? | Métodos com mesmo nome se comportando diferente | Herança múltipla | Atribuição dinâmica | Uso de interfaces | Métodos com mesmo nome se comportando diferente | POO
-Qual o resultado de 10 / 2 em Java? | 2 | 10 | 20 | 5 | 2 | Java Básico
+Qual o resultado de 10 % 2 em Java? | 2 | 10 | 20 | 5 | 2 | Java Básico
 Qual palavra-chave usamos para declarar variáveis? | int | let | var | define | int | Variáveis
 O que o operador != representa? | Menor | Igual | Maior | Diferente | Diferente | Operadores
 Qual operador representa AND lógico? | ! | & | || | && | && | Operadores

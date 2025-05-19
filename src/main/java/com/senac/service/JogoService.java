@@ -3,7 +3,11 @@ package com.senac.service;
 import com.senac.model.Pergunta;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.*;
+import java.util.List;
+import javax.swing.Timer;
 
 public class JogoService extends JFrame {
 
@@ -23,6 +27,12 @@ public class JogoService extends JFrame {
     private JButton responderButton;
     private JLabel statusLabel;
 
+    private Timer timer;
+    private int tempoRestante = 15;
+    private JLabel timerLabel;
+
+    private JLabel cabecalhoLabel;
+
     private Pergunta perguntaAtual;
 
     public JogoService(PerguntaService perguntaService, RankingService rankingService) {
@@ -30,120 +40,209 @@ public class JogoService extends JFrame {
         this.rankingService = rankingService;
 
         setTitle("Jogo de Perguntas");
-        setSize(600, 400);
+        setSize(700, 400);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-
+        initComponents();
     }
 
+    private void initComponents() {
+        JPanel painelPrincipal = new JPanel();
+        painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        cabecalhoLabel = new JLabel("Jogador: --- | Fase: ---");
+        cabecalhoLabel.setAlignmentX(CENTER_ALIGNMENT);
+        cabecalhoLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        painelPrincipal.add(cabecalhoLabel);
+
+        timerLabel = new JLabel("Tempo restante: 15s");
+        timerLabel.setAlignmentX(CENTER_ALIGNMENT);
+        timerLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        timerLabel.setForeground(Color.RED);
+        painelPrincipal.add(timerLabel);
+
+        perguntaLabel = new JLabel("Pergunta");
+        perguntaLabel.setAlignmentX(CENTER_ALIGNMENT);
+        perguntaLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        painelPrincipal.add(Box.createVerticalStrut(10));
+        painelPrincipal.add(perguntaLabel);
+
+        painelPrincipal.add(Box.createVerticalStrut(20));
+
+        grupoAlternativas = new ButtonGroup();
+        alternativasRadio = new JRadioButton[4];
+        for (int i = 0; i < 4; i++) {
+            alternativasRadio[i] = new JRadioButton();
+            grupoAlternativas.add(alternativasRadio[i]);
+            painelPrincipal.add(alternativasRadio[i]);
+        }
+
+        painelPrincipal.add(Box.createVerticalStrut(20));
+
+        responderButton = new JButton("Responder");
+        responderButton.setAlignmentX(CENTER_ALIGNMENT);
+        responderButton.addActionListener(this::processarResposta);
+        painelPrincipal.add(responderButton);
+
+        statusLabel = new JLabel(" ");
+        statusLabel.setAlignmentX(CENTER_ALIGNMENT);
+        statusLabel.setFont(new Font("Arial", Font.ITALIC, 12));
+        statusLabel.setForeground(Color.BLUE);
+        painelPrincipal.add(Box.createVerticalStrut(10));
+        painelPrincipal.add(statusLabel);
+
+        add(painelPrincipal);
+    }
+
+
     public void jogar(String[] nicks) {
-        Scanner scanner = new Scanner(System.in);
+        this.nicks = nicks;
         int numJogadores = nicks.length;
 
-        if (numJogadores < 1 || numJogadores > 4) {
-            System.out.println("Número de jogadores inválido. Encerrando o jogo.");
+        vidasJogadores = new int[numJogadores];
+        Arrays.fill(vidasJogadores, 3);
+        pontuacoes = new int[numJogadores];
+        fasePorJogador = new HashMap<>();
+        perguntasRespondidas = new HashMap<>();
+
+        for (int i = 0; i < numJogadores; i++) {
+            fasePorJogador.put(i, 1);
+            perguntasRespondidas.put(i, new HashSet<>());
+        }
+
+        carregarProximaPergunta();
+        setVisible(true);
+    }
+
+    private void carregarProximaPergunta() {
+        while (vidasJogadores[jogadorAtual] <= 0 || fasePorJogador.get(jogadorAtual) > perguntaService.getFases().size()) {
+            jogadorAtual = (jogadorAtual + 1) % nicks.length;
+            if (verificarFimDoJogo()) return;
+        }
+
+        int faseAtual = fasePorJogador.get(jogadorAtual);
+        String nomeFase = perguntaService.getFases().get(faseAtual - 1);
+        List<Pergunta> disponiveis = new ArrayList<>(perguntaService.getPerguntasDaFase(nomeFase));
+        disponiveis.removeAll(perguntasRespondidas.get(jogadorAtual));
+
+        if (disponiveis.isEmpty()) {
+            fasePorJogador.put(jogadorAtual, faseAtual + 1);
+            carregarProximaPergunta();
             return;
         }
 
-        int[] vidasJogadores = new int[numJogadores];
-        Arrays.fill(vidasJogadores, 3);
+        perguntaAtual = disponiveis.get(new Random().nextInt(disponiveis.size()));
+        perguntasRespondidas.get(jogadorAtual).add(perguntaAtual);
 
-        int[] pontuacoes = new int[numJogadores];
+        cabecalhoLabel.setText("Jogador: " + nicks[jogadorAtual] + " | Fase " + faseAtual + ": " + nomeFase);
+        perguntaLabel.setText("<html><br>" + perguntaAtual.getPergunta() + "</html>");
+        String[] alternativas = perguntaAtual.getAlternativas();
 
-        Map<Integer, Integer> fasePorJogador = new HashMap<>();
-        for (int i = 0; i < numJogadores; i++) fasePorJogador.put(i, 1);
-
-        Map<Integer, Set<Pergunta>> perguntasRespondidas = new HashMap<>();
-        for (int i = 0; i < numJogadores; i++) perguntasRespondidas.put(i, new HashSet<>());
-
-        while (true) {
-            List<Pergunta> perguntasFase = perguntaService.getPerguntasDaFaseAtual();
-
-            boolean jogoConcluido = true;
-            for (int i = 0; i < numJogadores; i++) {
-                if (vidasJogadores[i] > 0 && fasePorJogador.get(i) <= perguntaService.getFases().size()) {
-                    jogoConcluido = false;
-                    break;
-                }
-            }
-
-            if (jogoConcluido) {
-                System.out.println("Parabéns! Todos os jogadores concluíram o jogo ou foram eliminados!");
-                atualizarRankingFinal(nicks, pontuacoes, vidasJogadores, fasePorJogador);
-                break; // Sair do loop principal
-            }
-
-            for (int i = 0; i < numJogadores; i++) {
-                if (vidasJogadores[i] <= 0 || fasePorJogador.get(i) > perguntaService.getFases().size()) {
-                    System.out.println("Jogador " + nicks[i] + " está fora ou concluiu o jogo.");
-                    continue;
-                }
-
-                int faseAtualJogador = fasePorJogador.get(i);
-                String nomeFase = perguntaService.getFases().get(faseAtualJogador - 1);
-                List<Pergunta> perguntasDisponiveis = new ArrayList<>(perguntaService.getPerguntasDaFase(nomeFase));
-                perguntasDisponiveis.removeAll(perguntasRespondidas.get(i));
-
-                if (perguntasDisponiveis.isEmpty()) {
-                    System.out.println("Jogador " + nicks[i] + " já respondeu todas as perguntas da fase.");
-                    fasePorJogador.put(i, faseAtualJogador + 1);
-                    continue;
-                }
-
-
-                Pergunta pergunta = perguntasDisponiveis.get(new Random().nextInt(perguntasDisponiveis.size()));
-                perguntasRespondidas.get(i).add(pergunta);
-
-                System.out.println("===============================");
-                System.out.println("Jogador " + nicks[i] + " - Fase " + faseAtualJogador + ": " + nomeFase + " | " + vidasJogadores[i] + " vidas");
-                System.out.println("Pergunta: " + pergunta.getPergunta());
-
-                String[] letras = {"a", "b", "c", "d"};
-                Map<String, String> mapa = new HashMap<>();
-                for (int j = 0; j < pergunta.getAlternativas().length; j++) {
-                    mapa.put(letras[j], pergunta.getAlternativas()[j]);
-                    System.out.println(letras[j] + ") " + pergunta.getAlternativas()[j]);
-                }
-
-                System.out.print("Resposta: ");
-                String respostaUsuario = scanner.nextLine().trim();
-
-                if (!mapa.containsKey(respostaUsuario)) {
-                    System.out.println("Resposta inválida! Perdeu 1 vida.");
-                    vidasJogadores[i]--;
-                    if (vidasJogadores[i] == 0) {
-                        System.out.println("Jogador " + nicks[i] + " está eliminado!");
-                    }
-                    continue;
-                }
-
-                if (mapa.get(respostaUsuario).equalsIgnoreCase(pergunta.getResposta())) {
-                    System.out.println("Resposta correta!");
-                    System.out.println(perguntaService.getMensagemDeAcerto());
-                    pontuacoes[i] += 10;
-                    fasePorJogador.put(i, faseAtualJogador + 1);
-                } else {
-                    System.out.println("Resposta errada! A certa era: " + pergunta.getResposta());
-                    System.out.println(perguntaService.getMensagemDeErro());
-                    vidasJogadores[i]--;
-                    if (vidasJogadores[i] == 0) {
-                        System.out.println("Jogador " + nicks[i] + " está eliminado!");
-                    }
-                }
-            }
+        for (int i = 0; i < alternativas.length; i++) {
+            alternativasRadio[i].setText((char) ('A' + i) + ") " + alternativas[i]);
+            alternativasRadio[i].setSelected(false);
         }
+
+        statusLabel.setText("Vidas restantes: " + vidasJogadores[jogadorAtual] + " | Pontuação: " + pontuacoes[jogadorAtual]);
+
+        iniciarTimer();
     }
 
-    private void atualizarRankingFinal(String[] nicks, int[] pontuacoes, int[] vidasJogadores, Map<Integer, Integer> fasePorJogador) {
-        for (int i = 0; i < nicks.length; i++) {
-            if (vidasJogadores[i] > 0) {
-                pontuacoes[i] += (fasePorJogador.get(i) - 1) * 10; // Calcular pontuação final com base nas fases concluídas
+    private void iniciarTimer() {
+        if (timer != null && timer.isRunning()) {
+            timer.stop();
+        }
+
+        tempoRestante = 15;
+        timerLabel.setText("Tempo restante: " + tempoRestante + "s");
+
+        timer = new Timer(1000, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tempoRestante--;
+                timerLabel.setText("Tempo restante: " + tempoRestante + "s");
+
+                if (tempoRestante <= 0) {
+                    timer.stop();
+                    JOptionPane.showMessageDialog(null, "Tempo esgotado! Próximo jogador.");
+                    jogadorAtual = (jogadorAtual + 1) % nicks.length;
+                    if (!verificarFimDoJogo()) {
+                        carregarProximaPergunta();
+                    }
+                }
             }
-            try {
-                rankingService.atualizarRanking(nicks[i], pontuacoes[i]); // Atualizar ranking
-            } catch (Exception e) {
-                System.out.println("Erro ao atualizar o ranking para o jogador " + nicks[i] + ": " + e.getMessage());
+        });
+        timer.start();
+    }
+
+
+
+    private void processarResposta(ActionEvent e) {
+        int selecionada = -1;
+        if (timer != null && timer.isRunning()) {
+            timer.stop();
+        }
+
+        for (int i = 0; i < alternativasRadio.length; i++) {
+            if (alternativasRadio[i].isSelected()) {
+                selecionada = i;
+                break;
             }
         }
+
+        if (selecionada == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione uma alternativa!");
+            return;
+        }
+
+        String respostaEscolhida = perguntaAtual.getAlternativas()[selecionada];
+        if (respostaEscolhida.equalsIgnoreCase(perguntaAtual.getResposta())) {
+            JOptionPane.showMessageDialog(this, "Correto!\n" + perguntaService.getMensagemDeAcerto());
+            pontuacoes[jogadorAtual] += 10;
+            fasePorJogador.put(jogadorAtual, fasePorJogador.get(jogadorAtual) + 1);
+        } else {
+            JOptionPane.showMessageDialog(this, "Errado! A certa era: " + perguntaAtual.getResposta() + "\n" + perguntaService.getMensagemDeErro());
+            vidasJogadores[jogadorAtual]--;
+            if (vidasJogadores[jogadorAtual] == 0) {
+                JOptionPane.showMessageDialog(this, "Jogador " + nicks[jogadorAtual] + " foi eliminado!");
+            }
+        }
+
+        jogadorAtual = (jogadorAtual + 1) % nicks.length;
+
+        if (verificarFimDoJogo()) return;
+        carregarProximaPergunta();
+    }
+
+    private boolean verificarFimDoJogo() {
+        boolean todosConcluidos = true;
+        for (int i = 0; i < nicks.length; i++) {
+            if (vidasJogadores[i] > 0 && fasePorJogador.get(i) <= perguntaService.getFases().size()) {
+                todosConcluidos = false;
+                break;
+            }
+        }
+
+        if (todosConcluidos) {
+            StringBuilder msgFinal = new StringBuilder("Fim de jogo!\n\nRanking final:\n");
+            for (int i = 0; i < nicks.length; i++) {
+                if (vidasJogadores[i] > 0) {
+                    pontuacoes[i] += (fasePorJogador.get(i) - 1) * 10;
+                }
+                try {
+                    rankingService.atualizarRanking(nicks[i], pontuacoes[i]);
+                } catch (Exception e) {
+                    System.out.println("Erro ao atualizar ranking: " + e.getMessage());
+                }
+                msgFinal.append(nicks[i]).append(" - ").append(pontuacoes[i]).append(" pontos\n");
+            }
+
+            JOptionPane.showMessageDialog(this, msgFinal.toString());
+            dispose();
+            return true;
+        }
+
+        return false;
     }
 }
