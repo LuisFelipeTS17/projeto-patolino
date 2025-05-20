@@ -75,6 +75,7 @@ public class JogoService extends JFrame {
         for (int i = 0; i < 4; i++) {
             alternativasRadio[i] = new JRadioButton();
             grupoAlternativas.add(alternativasRadio[i]);
+            alternativasRadio[i].setAlignmentX(CENTER_ALIGNMENT);
             painelPrincipal.add(alternativasRadio[i]);
         }
 
@@ -136,7 +137,7 @@ public class JogoService extends JFrame {
         perguntasRespondidas.get(jogadorAtual).add(perguntaAtual);
 
         cabecalhoLabel.setText("Jogador: " + nicks[jogadorAtual] + " | Fase " + faseAtual + ": " + nomeFase);
-        perguntaLabel.setText("<html><br>" + perguntaAtual.getPergunta() + "</html>");
+        perguntaLabel.setText(perguntaAtual.getPergunta());
         String[] alternativas = perguntaAtual.getAlternativas();
 
         for (int i = 0; i < alternativas.length; i++) {
@@ -165,7 +166,8 @@ public class JogoService extends JFrame {
 
                 if (tempoRestante <= 0) {
                     timer.stop();
-                    JOptionPane.showMessageDialog(null, "Tempo esgotado! Próximo jogador.");
+                    vidasJogadores[jogadorAtual]--;
+                    JOptionPane.showMessageDialog(null, "Tempo esgotado! O jogador " + nicks[jogadorAtual] + " perdeu uma vida.");
                     jogadorAtual = (jogadorAtual + 1) % nicks.length;
                     if (!verificarFimDoJogo()) {
                         carregarProximaPergunta();
@@ -200,7 +202,9 @@ public class JogoService extends JFrame {
         if (respostaEscolhida.equalsIgnoreCase(perguntaAtual.getResposta())) {
             JOptionPane.showMessageDialog(this, "Correto!\n" + perguntaService.getMensagemDeAcerto());
             pontuacoes[jogadorAtual] += 10;
+            if (pontuacoes[jogadorAtual] >= 50){
             fasePorJogador.put(jogadorAtual, fasePorJogador.get(jogadorAtual) + 1);
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Errado! A certa era: " + perguntaAtual.getResposta() + "\n" + perguntaService.getMensagemDeErro());
             vidasJogadores[jogadorAtual]--;
