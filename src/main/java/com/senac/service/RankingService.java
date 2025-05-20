@@ -57,31 +57,31 @@ public class RankingService {
             if (jogador.getNick().equalsIgnoreCase(nick)) {
                 jogadorExistente = true;
                 if (pontuacao > jogador.getPontuacao()) {
-                    jogador.setPontuacao(pontuacao); // Atualizar pontuação se for maior
+                    jogador.setPontuacao(pontuacao);
                 }
                 break;
             }
         }
 
         if (!jogadorExistente) {
-            ranking.add(new Jogador(nick, pontuacao)); // Adicionar novo jogador ao ranking
+            ranking.add(new Jogador(nick, pontuacao));
         }
 
-        salvarRanking(ranking); // Salvar o ranking atualizado
+        salvarRanking(ranking);
     }
 
     public void exibirRanking() {
         List<Jogador> ranking = carregarRanking();
-        ranking.sort((j1, j2) -> Integer.compare(j2.getPontuacao(), j1.getPontuacao())); // Ordenar por pontuação decrescente
+        ranking.sort((j1, j2) -> Integer.compare(j2.getPontuacao(), j1.getPontuacao()));
 
         System.out.println("\n===== RANKING =====");
         for (int i = 0; i < ranking.size(); i++) {
             Jogador jogador = ranking.get(i);
             String medalha = switch (i) {
-                case 0 -> "🥇"; // Primeiro lugar
-                case 1 -> "🥈"; // Segundo lugar
-                case 2 -> "🥉"; // Terceiro lugar
-                default -> "";  // Sem medalha
+                case 0 -> "🥇";
+                case 1 -> "🥈";
+                case 2 -> "🥉";
+                default -> "";
             };
             System.out.println((i + 1) + "º " + medalha + " " + jogador.getNick() + " - " + jogador.getPontuacao() + " pontos");
         }
