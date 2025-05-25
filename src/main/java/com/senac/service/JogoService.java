@@ -20,6 +20,8 @@ public class JogoService extends JFrame {
     private int[] pontuacoes;
     private Map<Integer, Integer> fasePorJogador;
     private Map<Integer, Set<Pergunta>> perguntasRespondidas;
+    private Set<Pergunta> perguntasJaUtilizadasGlobalmente;
+
 
     private JLabel perguntaLabel;
     private JRadioButton[] alternativasRadio;
@@ -63,35 +65,47 @@ public class JogoService extends JFrame {
         painelPrincipal.add(timerLabel);
 
         perguntaLabel = new JLabel("Pergunta");
+        perguntaLabel.setHorizontalAlignment(SwingConstants.CENTER);
         perguntaLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        perguntaLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        painelPrincipal.add(Box.createVerticalStrut(10));
+        perguntaLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        painelPrincipal.add(Box.createVerticalStrut(15));
         painelPrincipal.add(perguntaLabel);
 
-        painelPrincipal.add(Box.createVerticalStrut(20));
+        painelPrincipal.add(Box.createVerticalStrut(25));
+
+//        JPanel alternativasPanel = new JPanel();
+//        alternativasPanel.setLayout(new BoxLayout(alternativasPanel, BoxLayout.Y_AXIS));
+//        alternativasPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+
+        JPanel alternativasWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        alternativasWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JPanel alternativasPanel = new JPanel();
         alternativasPanel.setLayout(new BoxLayout(alternativasPanel, BoxLayout.Y_AXIS));
-        alternativasPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         grupoAlternativas = new ButtonGroup();
         alternativasRadio = new JRadioButton[4];
+
         for (int i = 0; i < 4; i++) {
             alternativasRadio[i] = new JRadioButton();
+            alternativasRadio[i].setFont(new Font("Arial", Font.PLAIN, 14));
             grupoAlternativas.add(alternativasRadio[i]);
             alternativasRadio[i].setAlignmentX(Component.LEFT_ALIGNMENT);
             alternativasPanel.add(alternativasRadio[i]);
-            // if (i < alternativasRadio.length - 1) {
-            // alternativasPanel.add(Box.createVerticalStrut(5));
-            // }
+            if (i < alternativasRadio.length - 1) {
+                alternativasPanel.add(Box.createVerticalStrut(5));
+            }
         }
 
-        painelPrincipal.add(alternativasPanel);
+        alternativasWrapper.add(alternativasPanel);
+        painelPrincipal.add(alternativasWrapper);
 
-        painelPrincipal.add(Box.createVerticalStrut(20));
+        painelPrincipal.add(Box.createVerticalStrut(25));
 
         responderButton = new JButton("Responder");
         responderButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        responderButton.setFont(new Font("Arial", Font.BOLD, 14));
         responderButton.addActionListener(this::processarResposta);
         painelPrincipal.add(responderButton);
 
@@ -114,7 +128,9 @@ public class JogoService extends JFrame {
         Arrays.fill(vidasJogadores, 3);
         pontuacoes = new int[numJogadores];
         fasePorJogador = new HashMap<>();
+
         perguntasRespondidas = new HashMap<>();
+        perguntasJaUtilizadasGlobalmente = new HashSet<>();
 
         for (int i = 0; i < numJogadores; i++) {
             fasePorJogador.put(i, 1);
@@ -126,43 +142,78 @@ public class JogoService extends JFrame {
     }
 
     private void carregarProximaPergunta() {
+        int loopGuard = 0;
         while (vidasJogadores[jogadorAtual] <= 0 || fasePorJogador.get(jogadorAtual) > perguntaService.getFases().size()) {
             jogadorAtual = (jogadorAtual + 1) % nicks.length;
-            if (verificarFimDoJogo()) return;
+            loopGuard++;
+            if (verificarFimDoJogo()) {
+                return;
+            }
+            if (loopGuard > nicks.length && nicks.length > 0) {
+                System.err.println("JogoService.carregarProximaPergunta: Nenhum jogador ativo encontrado, mas o jogo não foi finalizado. Verifique a lógica de verificarFimDoJogo.");
+                if (!verificarFimDoJogo()) {
+                    JOptionPane.showMessageDialog(this, "Erro crítico: Impossível prosseguir. Nenhum jogador ativo.", "Erro no Jogo", JOptionPane.ERROR_MESSAGE);
+                    dispose();
+                }
+                return;
+            }
         }
 
-        int faseAtual = fasePorJogador.get(jogadorAtual);
-        String nomeFase = perguntaService.getFases().get(faseAtual - 1);
-        List<Pergunta> disponiveis = new ArrayList<>(perguntaService.getPerguntasDaFase(nomeFase));
-        disponiveis.removeAll(perguntasRespondidas.get(jogadorAtual));
+        int faseNumeroJogador = fasePorJogador.get(jogadorAtual);
 
-        if (disponiveis.isEmpty()) {
-            fasePorJogador.put(jogadorAtual, faseAtual + 1);
+        if (faseNumeroJogador <= 0 || faseNumeroJogador > perguntaService.getFases().size()) {
+            System.err.println("Jogador " + nicks[jogadorAtual] + " está em uma fase inválida: " + faseNumeroJogador + ". Tentando corrigir ou finalizar.");
+            fasePorJogador.put(jogadorAtual, perguntaService.getFases().size() + 1);
+            if (!verificarFimDoJogo()) {
+                carregarProximaPergunta();
+            }
+            return;
+        }
+        String nomeFase = perguntaService.getFases().get(faseNumeroJogador - 1);
+
+        List<Pergunta> todasPerguntasDaFase = perguntaService.getPerguntasDaFase(nomeFase);
+        List<Pergunta> perguntasRealmenteDisponiveis = new ArrayList<>();
+
+        for (Pergunta p : todasPerguntasDaFase) {
+            boolean usadaGlobalmente = perguntasJaUtilizadasGlobalmente.contains(p);
+            boolean respondidaPeloJogadorAtual = perguntasRespondidas.get(jogadorAtual).contains(p);
+
+            if (!usadaGlobalmente && !respondidaPeloJogadorAtual) {
+                perguntasRealmenteDisponiveis.add(p);
+            }
+        }
+
+        if (perguntasRealmenteDisponiveis.isEmpty()) {
+
+            fasePorJogador.put(jogadorAtual, faseNumeroJogador + 1);
+
+            if (verificarFimDoJogo()) {
+                return;
+            }
             carregarProximaPergunta();
             return;
         }
 
-        perguntaAtual = disponiveis.get(new Random().nextInt(disponiveis.size()));
+        perguntaAtual = perguntasRealmenteDisponiveis.get(new Random().nextInt(perguntasRealmenteDisponiveis.size()));
+
         perguntasRespondidas.get(jogadorAtual).add(perguntaAtual);
+        perguntasJaUtilizadasGlobalmente.add(perguntaAtual);
 
-        cabecalhoLabel.setText("Jogador: " + nicks[jogadorAtual] + " | Fase " + faseAtual + ": " + nomeFase);
-        perguntaLabel.setText("<html><body style='width: 500px; text-align: center;'>" + perguntaAtual.getPergunta() + "</body></html>");
+        cabecalhoLabel.setText("Jogador: " + nicks[jogadorAtual] + " | Fase " + faseNumeroJogador + ": " + nomeFase);
+        perguntaLabel.setText("<html><body style='text-align: center;'>" + perguntaAtual.getPergunta() + "</body></html>");
+
         String[] alternativas = perguntaAtual.getAlternativas();
-
-        for (int i = 0; i < alternativas.length; i++) {
-            if (i < alternativasRadio.length) {
+        for (int i = 0; i < alternativasRadio.length; i++) {
+            if (i < alternativas.length) {
                 alternativasRadio[i].setText((char) ('A' + i) + ") " + alternativas[i]);
                 alternativasRadio[i].setSelected(false);
                 alternativasRadio[i].setVisible(true);
+            } else {
+                alternativasRadio[i].setVisible(false);
             }
         }
-        for (int i = alternativas.length; i < alternativasRadio.length; i++) {
-            alternativasRadio[i].setVisible(false);
-        }
-
 
         statusLabel.setText("Vidas restantes: " + vidasJogadores[jogadorAtual] + " | Pontuação: " + pontuacoes[jogadorAtual]);
-
         iniciarTimer();
     }
 
@@ -184,6 +235,11 @@ public class JogoService extends JFrame {
                     timer.stop();
                     vidasJogadores[jogadorAtual]--;
                     JOptionPane.showMessageDialog(JogoService.this, "Tempo esgotado! O jogador " + nicks[jogadorAtual] + " perdeu uma vida.");
+
+                    if (vidasJogadores[jogadorAtual] == 0) {
+                        JOptionPane.showMessageDialog(JogoService.this, "Jogador " + nicks[jogadorAtual] + " foi eliminado!");
+                    }
+
                     jogadorAtual = (jogadorAtual + 1) % nicks.length;
                     if (!verificarFimDoJogo()) {
                         carregarProximaPergunta();
@@ -217,7 +273,7 @@ public class JogoService extends JFrame {
         }
 
         if (perguntaAtual == null || perguntaAtual.getAlternativas() == null || selecionada >= perguntaAtual.getAlternativas().length) {
-            JOptionPane.showMessageDialog(this, "Erro ao processar a resposta. Tente novamente.");
+            JOptionPane.showMessageDialog(this, "Erro ao processar a resposta. A pergunta pode não ter sido carregada corretamente.");
             jogadorAtual = (jogadorAtual + 1) % nicks.length;
             if (!verificarFimDoJogo()) {
                 carregarProximaPergunta();
@@ -229,6 +285,7 @@ public class JogoService extends JFrame {
         if (respostaEscolhida.equalsIgnoreCase(perguntaAtual.getResposta())) {
             JOptionPane.showMessageDialog(this, "Correto!\n" + perguntaService.getMensagemDeAcerto());
             pontuacoes[jogadorAtual] += 10;
+
             if (pontuacoes[jogadorAtual] > 0 && pontuacoes[jogadorAtual] % 50 == 0) {
                 int faseAtualDoJogador = fasePorJogador.get(jogadorAtual);
                 int proximaFasePotencial = faseAtualDoJogador + 1;
@@ -237,10 +294,8 @@ public class JogoService extends JFrame {
                     fasePorJogador.put(jogadorAtual, proximaFasePotencial);
                     JOptionPane.showMessageDialog(this, "Jogador " + nicks[jogadorAtual] + " avançou para a Fase " + proximaFasePotencial + "!");
                 } else {
-
                     fasePorJogador.put(jogadorAtual, proximaFasePotencial);
                     JOptionPane.showMessageDialog(this, "Parabéns, " + nicks[jogadorAtual] + "! Você completou todas as fases com " + pontuacoes[jogadorAtual] + " pontos!");
-
                 }
             }
         } else {
@@ -256,7 +311,6 @@ public class JogoService extends JFrame {
         if (verificarFimDoJogo()) {
             return;
         }
-
         carregarProximaPergunta();
     }
 
@@ -267,40 +321,54 @@ public class JogoService extends JFrame {
                 jogadoresAtivos++;
             }
         }
-        boolean todosCompletaramOuEliminados = true;
+
+        boolean todosCompletaramOuForamEliminados = true;
         if (jogadoresAtivos == 0 && nicks.length > 0) {
-            todosCompletaramOuEliminados = true;
+            todosCompletaramOuForamEliminados = true;
         } else {
             for (int i = 0; i < nicks.length; i++) {
                 if (vidasJogadores[i] > 0 && fasePorJogador.get(i) <= perguntaService.getFases().size()) {
-                    todosCompletaramOuEliminados = false;
+                    todosCompletaramOuForamEliminados = false;
                     break;
                 }
             }
         }
 
-
-        if (todosCompletaramOuEliminados) {
+        if (todosCompletaramOuForamEliminados) {
             StringBuilder msgFinal = new StringBuilder("Fim de jogo!\n\nRanking final:\n");
-            List<Integer> indicesJogadores = new ArrayList<>();
-            for (int i = 0; i < nicks.length; i++) indicesJogadores.add(i);
-            indicesJogadores.sort((j1, j2) -> Integer.compare(pontuacoes[j2], pontuacoes[j1]));
+            List<Map.Entry<String, Integer>> rankingList = new ArrayList<>();
+            for(int i=0; i < nicks.length; i++){
+                rankingList.add(new AbstractMap.SimpleEntry<>(nicks[i], pontuacoes[i]));
+            }
+            rankingList.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
 
 
-            for (int i : indicesJogadores) {
-                try {
-                    rankingService.atualizarRanking(nicks[i], pontuacoes[i]);
-                } catch (Exception e) {
-                    System.err.println("Erro ao atualizar ranking para " + nicks[i] + ": " + e.getMessage());
+            for (Map.Entry<String, Integer> entry : rankingList) {
+                String nickJogador = entry.getKey();
+                int pontuacaoJogador = entry.getValue();
+                int indiceOriginal = -1;
+                for(int j=0; j<nicks.length; j++){
+                    if(nicks[j].equals(nickJogador)){
+                        indiceOriginal = j;
+                        break;
+                    }
                 }
-                msgFinal.append(nicks[i]).append(" - ").append(pontuacoes[i]).append(" pontos");
-                if (vidasJogadores[i] == 0) {
+
+                try {
+                    rankingService.atualizarRanking(nickJogador, pontuacaoJogador);
+                } catch (Exception e) {
+                    System.err.println("Erro ao atualizar ranking para " + nickJogador + ": " + e.getMessage());
+                }
+                msgFinal.append(nickJogador).append(" - ").append(pontuacaoJogador).append(" pontos");
+                if (vidasJogadores[indiceOriginal] == 0) {
                     msgFinal.append(" (Eliminado)");
+                } else if (fasePorJogador.get(indiceOriginal) > perguntaService.getFases().size()){
+                    msgFinal.append(" (Concluiu todas as fases)");
                 }
                 msgFinal.append("\n");
             }
 
-            JOptionPane.showMessageDialog(this, msgFinal.toString());
+            JOptionPane.showMessageDialog(this, msgFinal.toString(), "Fim de Jogo - Ranking", JOptionPane.INFORMATION_MESSAGE);
             dispose();
             return true;
         }
